@@ -7,41 +7,46 @@ from pathlib import Path
 
 
 
-def load_question(path:str)->list[Any]:
+"""In the following function, we load the csv file which hold the company's question by the help of pandas.
+   Then create the resonse by the help 'llm_response' function. Then take the response and rewrite that response to the original 
+   file which hold all the questions of Company"""
+   
+def load_question(path:str, chunks:list[Any])->list[Any]:
     file_path=Path(path).resolve()
     path=file_path.glob('*.csv')
     for file in path:
-        file=pd.read_csv(str(file))
-        print("sucessfully load the questions file.......................")
+        df=pd.read_csv(str(file))
+        print("sucessfully load the questions file/////////////////////")
     
-    
-    file=file.iloc[:,[0,1,2,3]]
-    file.columns=["id","Question","Response", 'Confidence']
-    
-    question_index=file[file.iloc[:,0].apply(lambda x: str(x).strip().isdigit())].index
-    
-    
-    retriver=retiver_fun(chunks)
-    print("sucessfully retrive function run ///////////////////")
-    print(f"sucessfully call the both functions")
-    
-    for index in question_index:
-        question=file.loc[index,"Question"]
-        response=llm_response(question,retriver)
-        response=response.content.split('\n')
-        file.loc[index,"Response"]=response[2]
-        file.loc[index,"Confidence"]=response[0]+response[1]
-        output_file=file_path/f"processed_file"
-        file.to_csv(output_file, index=False)
-        print("sucessfully made changes to the file, path of file{output_file}")
-        break
+        df=df.iloc[:,[0,1,2,3]]
+        df.columns=["id","Question","Response", 'Confidence']
         
-    return "Sucessssssssss"   
+        # question_index=df[df.iloc[:,0].apply(lambda x: str(x).strip().isdigit())].index
+        # 'coerce' turns non-numeric strings (like "Header" or empty cells) into NaN
+        numeric_ids = pd.to_numeric(df.iloc[:, 0], errors='coerce')
+        # Get the index where the ID is NOT null (meaning it is a valid int or float)
+        question_index = df[numeric_ids.notnull()].index
+        
+        retriver=retiver_fun(chunks)
+        print("sucessfully retrive function run ///////////////////")
+        
+        for index in question_index:
+            question=df.loc[index,"Question"]
+            # here we generate the llm response 
+            response=llm_response(question,retriver)
+            # here we extract the content of the response, which is a string now. We split the string and return a list of string
+            response=response.content.split('\n')
+            df.at[index,"Response"]=response[2]
+            df.at[index,"Confidence"]=response[0]+' '+(response[1])
+            # output_file=file_path/f"processed_file"
+            print(f"RESPONSE FOR QUESTION AT INDEX: {index} of RESPONSE COLUMN: \n {response}\n\n")
+            df.to_csv(file, index=False)
+            print(f"sucessfully made changes to the file, path of file{file}")
+        
+    return "SUCESSFULLY WRITE ALL THE ANSWERS/RESPONSE ALONG WITH THE CONFIDENCE SCORE IN THE COMAPNY'S FILE"   
     
 data=data_loader("dataset")
 chunks=doc_chunker(data)
-print("sucessfully do the chunks//////////")
-# retiver=retiver_fun(chunks)
-# print(f"sucessfully call the both functions")
+print("Sucessfully do the chunks/////////////////")
 
-question=load_question('Dataset')
+question=load_question('Dataset',chunks)

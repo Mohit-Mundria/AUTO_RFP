@@ -1,4 +1,8 @@
+python
 numpy
 pandas
-scikit-learn
-python
+langchain
+pathlib
+langchain_google_genai
+langchain_community
+langchain_text_splitter
