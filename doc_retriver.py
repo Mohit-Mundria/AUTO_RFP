@@ -1,5 +1,5 @@
 from pypdf import PdfReader
-from langchain.schema import Document
+from langchain_core.documents import Document
 from dotenv import load_dotenv
 from typing import Any, List
 from pathlib import Path
