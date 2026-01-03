@@ -1,4 +1,4 @@
-# 🕵️ NexusAI: Enterprise RFP & Security Questionnaire Automator
+# 🕵️ NexusAI: Enterprise RFP & Security Questionnaire Automator (A Business To Business Problem Solver)
 # 📌 The Problem: The "40-Hour" Compliance Bottleneck
 Enterprise sales teams face a massive hurdle: Security RFPs. Companies must answer hundreds of complex technical questions (e.g., "How is data encrypted at rest in your DB?") by manually searching through 100+ page security policies, AWS/Azure whitepapers, and SOC2 reports.
 
