@@ -6,9 +6,12 @@ from dotenv import load_dotenv
 import os
 load_dotenv()
 
-embedding_model=GoogleGenerativeAIEmbeddings(model='models/text-embedding-004')
+# Here we load all the required models of Google Gemini
+embedding_model=GoogleGenerativeAIEmbeddings(model='models/text-embedding-004',transport="rest")
 model=ChatGoogleGenerativeAI(model='gemini-2.5-flash-lite',temperature=0.6)
 db_path="faiss.index"
+
+# In the following function we perform embedding, and then store that in the Vector Database and then create a retriver object
 def retiver_fun(embedding:list[Any]):
     db_path="faiss.index"
     if os.path.exists(db_path):
@@ -24,7 +27,9 @@ def retiver_fun(embedding:list[Any]):
 
 
 
+# In the following function, we take the query and then the retriver retrive the relevent context for the llm to generate a accurate response
 def llm_response(query:str,retriver):
+    # here the retriver retrive the context and combine them in a single string
     context=retriver.invoke(query)
     content='\n\n'.join(page.page_content for page in context)
     
@@ -54,6 +59,7 @@ def llm_response(query:str,retriver):
     The Question/Query is: {question}
     """,
     input_variables=['context', 'question'])
+    # here we made our final prompt with the given query and the retrived context
     final_prompt=prompt.invoke({'context':content, 'question':query})
     
     response=model.invoke(final_prompt)

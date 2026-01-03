@@ -18,9 +18,6 @@ def doc_chunker(documents:list[Any])->np.ndarray:
     texts=[page.page_content for page in documents]
     chunks=splitter.create_documents(texts)
     print(f"The size of chunks of the documents is: {len(chunks)}")
-    print("documents are: ", len(documents))
-    print("text is: ",len(texts))
-    print("Chunks are: ",len(chunks))
     return chunks
 
 # def embedding(chunks:list[Any], model_name:str="models/text-embedding-004")->np.ndarray:
