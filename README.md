@@ -2,6 +2,12 @@
 # Live Project Simulation Link: 
 https://autorfp-8vvyzwavy3vmzejdqzkbu3.streamlit.app/
 
+Output_ScreenRecording_RFP: 
+https://youtu.be/srC5kR8GF-0
+
+Deployed_ProjectOutput_RFP:
+https://youtu.be/SZZvgpEyAUo
+
 # 📌 The Problem: The "40-Hour" Compliance Bottleneck
 Enterprise sales teams face a massive hurdle: Security RFPs. Companies must answer hundreds of complex technical questions (e.g., "How is data encrypted at rest in your DB?") by manually searching through 100+ page security policies, AWS/Azure whitepapers, and SOC2 reports.
 
@@ -29,7 +35,7 @@ The project is built using a Decoupled Architecture, separating the UI (Streamli
 * Embeddings: Google Generative AI Embeddings (models/embedding-001).
 
 # 3. LLM Pipeline & Grounded Generation
-* Model: Google Gemini 1.5 Flash (optimized for speed and long-context window).
+* Model: Google Gemini 2.5 Flash (optimized for speed and long-context window).
 * The "Zero-Hallucination" Prompt: The system uses a strict system prompt. If the answer is not found in the vector search results, the LLM is forced to state "Information not found" rather than guessing.
 * Rate-Limit Handling: Custom logic built to handle the Gemini Free Tier constraints, including time.sleep intervals and error-retry logic to ensure the pipeline doesn't crash during long CSV processing.
 
