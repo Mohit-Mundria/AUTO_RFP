@@ -1,5 +1,7 @@
 from langchain_community.vectorstores import FAISS
 from langchain_google_genai import GoogleGenerativeAIEmbeddings, ChatGoogleGenerativeAI
+from openai import OpenAI
+from langchain_openai import ChatOpenAI
 from langchain_core.prompts import PromptTemplate
 from typing import Any
 from dotenv import load_dotenv
@@ -7,8 +9,13 @@ import os
 load_dotenv()
 
 # Here we load all the required models of Google Gemini
+# model=OpenAI(model='openai/gpt-oss-120b', temperature=0.5)
+model=ChatOpenAI(
+    base_url="https://api.groq.com/openai/v1",
+    model="openai/gpt-oss-120b"
+)
 embedding_model=GoogleGenerativeAIEmbeddings(model='models/text-embedding-004',transport="rest")
-model=ChatGoogleGenerativeAI(model='gemini-2.5-flash-lite',temperature=0.6)
+# model=ChatGoogleGenerativeAI(model='gemini-2.5-flash-lite',temperature=0.6)
 db_path="faiss.index"
 
 # In the following function we perform embedding, and then store that in the Vector Database and then create a retriver object
@@ -67,4 +74,6 @@ def llm_response(query:str,retriver):
     return response
     
     
+    
+
     

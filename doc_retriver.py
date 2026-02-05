@@ -1,10 +1,7 @@
 from pypdf import PdfReader
 from langchain_core.documents import Document
 from dotenv import load_dotenv
-from typing import Any, List
-from pathlib import Path
 import numpy as np
-from langchain_community.document_loaders import UnstructuredFileIOLoader
 
 load_dotenv()
 # This Function is used to load the data from the given folder name, and return a documents
@@ -16,6 +13,10 @@ def data_loader(uploaded_pdfs)->np.ndarray:
     # data_path=list(data_path.glob('**/*.pdf'))
     # print(f"The file paths for the documents: {data_path}")
     documents=[]
+    # uploaded_files=[]
+    # for i in uploaded_pdfs:
+    #     if isinstance(i, bytes):
+    #         uploaded_file = BytesIO(i)
     
     for uploaded_file in uploaded_pdfs:
         reader=PdfReader(uploaded_file)

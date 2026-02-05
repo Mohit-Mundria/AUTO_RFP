@@ -5,7 +5,7 @@ import time
 import streamlit as st
 import pandas as pd
 from typing import Any
-from frontend_code.frontend import render_first_page, render_second_page, download_csv
+from frontend_code.updated_frontend import apply_styles, render_aboutpage, render_contactpage, render_firstpage, render_navbar, render_secondpage, render_thirdpage, change_pg
 
 
 def file_processing(uploaded_pdf,uploaded_csv):
@@ -18,6 +18,8 @@ def file_processing(uploaded_pdf,uploaded_csv):
     numeric_ids = pd.to_numeric(df.iloc[:, 0], errors='coerce')
     # Get the index where the ID is NOT null (meaning it is a valid int or float)
     question_index = df[numeric_ids.notnull()].index
+    
+    print(f"the pdf file type is {type(uploaded_pdf)} and size is {len(uploaded_pdf)}")
     data=data_loader(uploaded_pdf)
     chunks=doc_chunker(data)
     retriver=retiver_fun(chunks)
@@ -30,17 +32,51 @@ def file_processing(uploaded_pdf,uploaded_csv):
         response=response.content.split('\n')
         df.at[index,"Response"]=response[2]
         df.at[index,"Confidence"]=response[0]+' '+(response[1])
-        time.sleep(2) 
+        time.sleep(30) 
                     
     return df
 
 
 
-render_first_page() 
-uploaded_pdfs, uploaded_csv=render_second_page()
-if st.button("Generate Answers"):
-    document=file_processing(uploaded_pdfs, uploaded_csv)
-    download_csv(document)
+apply_styles()
+render_navbar()
+if 'pg' not in st.session_state:
+    st.session_state.pg = 'home'
+if 'processed_data' not in st.session_state:
+    st.session_state.processed_data = None
+if st.session_state.pg == 'home':
+    render_firstpage()
+
+elif st.session_state.pg == 'upload':
+    # CRITICAL: We capture the return, but don't crash if it's None
+    pdf, csv = render_secondpage()
+    
+    if pdf and csv:
+        if st.button("⚡ GENERATE REPORT", type="primary", use_container_width=True):
+            with st.spinner("AI is thinking..."):
+                # SIMULATION: Replace this with your actual 'file_processing' function
+                # documents = file_processing(pdf, xls)
+                documents=file_processing(pdf, csv)
+                # dummy_df = pd.DataFrame({"Question": ["Test"], "Answer": ["Success"]})
+                st.session_state.processed_data = documents.to_csv(index=False).encode('utf-8')
+                change_pg('result')
+    else:
+        st.info("Please upload both files to enable report generation.")
+
+elif st.session_state.pg == 'result':
+    render_thirdpage()
+
+elif st.session_state.pg == 'about':
+    render_aboutpage()
+    if st.button("Back"): change_pg('home')
+
+elif st.session_state.pg == 'contact':
+    render_contactpage()
+    if st.button("Back"): change_pg('home') 
+
+    
+
+
 
 
 

@@ -1,6 +1,4 @@
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_community.vectorstores import FAISS
-from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from typing import Any
 import numpy as np
 from dotenv import load_dotenv
@@ -10,8 +8,8 @@ load_dotenv()
 # In this function we chunks the document in the fixed length to process properly.
 def doc_chunker(documents:list[Any])->np.ndarray:
     splitter=RecursiveCharacterTextSplitter(
-        chunk_size=1000,
-        chunk_overlap=200,
+        chunk_size=512,
+        chunk_overlap=130,
         separators=["\n\nSECTION", "\n\n", "\n"]
     )
     # here we take only the content of the pages

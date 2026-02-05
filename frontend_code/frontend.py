@@ -20,7 +20,7 @@ def render_first_page():
         """)
     
     with col2:
-        st.info("**Key Technologies:**\n- LangChain\n- Google Gemini 1.5\n- FAISS Vector Store\n- pypdf (Stream Processing)")
+        st.info("**Key Technologies:**\n- LangChain\n- Retrival Augumented Generator\n- Google Gemini 2.5\n- Streamlit(frontend)\n- FAISS Vector Store\n- Embeddings\n- pypdf (Stream Processing)")
 
     st.markdown("### 🏗️ System Architecture & Logic")
     
@@ -55,7 +55,7 @@ for page in reader.pages:
         st.write("""
         The LLM is strictly constrained. It is instructed to *only* answer using the provided 
         context. If the information isn't in the uploaded PDFs, it will flag it as 'Not Found' 
-        rather than hallucinating.
+        rather than hallucinating. Also it give a confidence score and reason that tell directly to the reader, about correctness of the response.
         """)
 
     # --- STEP-BY-STEP USER GUIDE ---
@@ -66,9 +66,6 @@ for page in reader.pages:
     col_a.markdown("**1. Upload Knowledge**\nProvide company policy PDFs or AWS/Azure security whitepapers.")
     col_b.markdown("**2. Upload RFP**\nProvide the questionnaire in .CSV format (Column 2 must be the question).")
     col_c.markdown("**3. Process & Download**\nThe system will generate answers, confidence scores, and a reason for each.")
-
-    # --- CALL TO ACTION ---
-    st.sidebar.success("Ready? Switch to 'RFP Processor' in the sidebar to start.")   
     
     
 def render_second_page()->list[Any]:
@@ -85,37 +82,9 @@ def render_second_page()->list[Any]:
     st.subheader("Step 2: Upload RFP Questions")
     uploaded_csv = st.file_uploader("Upload RFP Questionnaire (CSV)", type="csv")
     return [uploaded_pdfs, uploaded_csv]
-
-        # if uploaded_csv:
-        #     df = pd.read_csv(uploaded_csv)
+                 
                     
-        #     if st.button("Generate Answers"):        
-        #         df=df.iloc[:,[0,1,2,3]]
-        #         df.columns=["id","Question","Response", 'Confidence']
-        #         st.write("Preview of Input CSV:", df.iloc[0:15,])
-
-        #         # 'coerce' turns non-numeric strings (like "Header" or empty cells) into NaN
-        #         numeric_ids = pd.to_numeric(df.iloc[:, 0], errors='coerce')
-        #         # Get the index where the ID is NOT null (meaning it is a valid int or float)
-        #         question_index = df[numeric_ids.notnull()].index
-        #         data=data_loader(uploaded_pdfs)
-        #         chunks=doc_chunker(data)
-        #         retriver=retiver_fun(chunks)
-                
-        #         for i,index in enumerate(question_index):
-        #             question=df.loc[index,"Question"]
-        #              # here we generate the llm response 
-        #             response=llm_response(question,retriver)
-        #              # here we extract the content of the response, which is a string now. We split the string and return a list of string
-        #             response=response.content.split('\n')
-        #             df.at[index,"Response"]=response[2]
-        #             df.at[index,"Confidence"]=response[0]+' '+(response[1])
-        #             time.sleep(2) 
-                
-                    
-                    
-def download_csv(dataset):                  
-    # DOWNLOAD BUTTON
+def download_csv(dataset):        
     st.success("Processing Complete!")
     csv = dataset.to_csv(index=False).encode('utf-8')
     st.download_button(
@@ -124,3 +93,5 @@ def download_csv(dataset):
         file_name='Answered_RFP.csv',
         mime='text/csv',
             )
+    
+    
