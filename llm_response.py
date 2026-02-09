@@ -1,34 +1,45 @@
 from langchain_community.vectorstores import FAISS
-from langchain_google_genai import GoogleGenerativeAIEmbeddings, ChatGoogleGenerativeAI
-from openai import OpenAI
+from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import PromptTemplate
 from typing import Any
 from dotenv import load_dotenv
 import os
+import time
+from securities import analyze_pii_data
 load_dotenv()
+from getpass import getpass
 
-# Here we load all the required models of Google Gemini
-# model=OpenAI(model='openai/gpt-oss-120b', temperature=0.5)
 model=ChatOpenAI(
     base_url="https://api.groq.com/openai/v1",
     model="openai/gpt-oss-120b"
 )
-embedding_model=GoogleGenerativeAIEmbeddings(model='models/text-embedding-004',transport="rest")
-# model=ChatGoogleGenerativeAI(model='gemini-2.5-flash-lite',temperature=0.6)
-db_path="faiss.index"
+GOOGLE_API_KEY=os.getenv('GOOGLE_API_KEY')
+embedding_model=GoogleGenerativeAIEmbeddings(google_api_key=GOOGLE_API_KEY, model='models/gemini-embedding-001',task_type="retrieval_document",transport="rest")
 
 # In the following function we perform embedding, and then store that in the Vector Database and then create a retriver object
-def retiver_fun(embedding:list[Any]):
+def retiver_fun(chunks:list[Any]):
     db_path="faiss.index"
     if os.path.exists(db_path):
         vector_db=FAISS.load_local(db_path,embedding_model,allow_dangerous_deserialization=True)
         print("sucessfully load the vector database which alreday present")
     else:
+        # text=[chunk.page_content for chunk in chunks]
+        # print("text afetr the embedding,: ", len(text))
+        # embeddings=embedding_model.embed_documents(text)
+        # print(f"Successfully create the embeddings of the chunks")
         print("Vector store is not present, creating vectorDatabase............")
-        vector_db=FAISS.from_documents(embedding,embedding_model)
+        batch_size=20
+        time_delay=10
+        first_batch=chunks[:batch_size]
+        vector_db=FAISS.from_documents(first_batch, embedding_model)
+        for i in range(batch_size, len(chunks), batch_size):
+            batch=chunks[batch_size:1+batch_size]
+            vector_db.add_documents(batch)
+            print(f"Progress: {i + len(batch)}/{len(chunks)} chunks indexed...")
+            time.sleep(time_delay)
         vector_db.save_local(db_path)
-        print("save fresh new data vector.......at given location.............")
+        print("Step of Vector Database creation is completed and Save fresh new data vector.......at given location.............")
     retriver=vector_db.as_retriever(search_type='similarity', search_kwargs={'k':8})
     return retriver
 
@@ -39,6 +50,9 @@ def llm_response(query:str,retriver):
     # here the retriver retrive the context and combine them in a single string
     context=retriver.invoke(query)
     content='\n\n'.join(page.page_content for page in context)
+    
+    # Here we process the context dilvering by RAG for PERSONALLY IDENTIFIABLE INFORMATION(PII). And then give to LLM.
+    content=analyze_pii_data(content)
     
     prompt = PromptTemplate(template="""You are the NexusAI Security Compliance Officer. Your goal is to answer RFP (Request for Proposal)"
     "questions accurately using ONLY the provided context from our internal security policies and AWS whitepapers."

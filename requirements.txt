@@ -4,7 +4,10 @@ langchain
 langchain_core
 pathlib
 langchain_google_genai
+langchain_openai
 langchain_community
 pypdf
 python_dotenv
 faiss_cpu
+presidio_analyzer
+presidio_anonymizer
