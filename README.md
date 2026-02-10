@@ -1,3 +1,14 @@
+---
+title: NexusAI
+emoji: 🛡️
+colorFrom: blue
+colorTo: slate
+sdk: streamlit
+sdk_version: 1.31.0
+app_file: app.py
+pinned: false
+---
+
 # 🕵️ TurboRFP: Enterprise RFP & Security Questionnaire Automator (A Business To Business Problem Solver)
 # Live Project Simulation Link: 
 https://autorfp-8vvyzwavy3vmzejdqzkbu3.streamlit.app/
