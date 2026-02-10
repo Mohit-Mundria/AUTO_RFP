@@ -1,4 +1,4 @@
-# 🕵️ NexusAI: Enterprise RFP & Security Questionnaire Automator (A Business To Business Problem Solver)
+# 🕵️ TurboRFP: Enterprise RFP & Security Questionnaire Automator (A Business To Business Problem Solver)
 # Live Project Simulation Link: 
 https://autorfp-8vvyzwavy3vmzejdqzkbu3.streamlit.app/
 
@@ -15,19 +15,19 @@ Enterprise sales teams face a massive hurdle: Security RFPs. Companies must answ
 * Risk: High chance of human error/hallucination in answers.
 * Scalability: Impossible to handle 10+ RFPs simultaneously without a massive team.
 
-# 🚀 The Solution: NexusAI
-NexusAI is an End-to-End RAG (Retrieval-Augmented Generation) Pipeline designed to automate the extraction and answering process. It transforms unstructured PDF policies into a searchable vector brain, providing grounded, high-confidence answers to CSV-based questionnaires in minutes.
+# 🚀 The Solution: TurboRFP
+TurboRFP is an End-to-End RAG (Retrieval-Augmented Generation) Pipeline designed to automate the extraction and answering process. It transforms unstructured PDF policies into a searchable vector brain, providing grounded, high-confidence answers to CSV-based questionnaires in minutes.
 
 # 🛠️ System Architecture & Logic Flow
 The project is built using a Decoupled Architecture, separating the UI (Streamlit), the Orchestration (App Controller), and the Brain (RAG Engine).
 
 # 1. In-Memory Data Ingestion (Engineering Effort)
-* Most beginner projects rely on local folder paths. NexusAI uses Stream-based Processing.
+* Most beginner projects rely on local folder paths. TurboRFP uses Stream-based Processing.
   Logic: Files are handled as BytesIO streams. This ensures the app is cloud-ready and doesn't require a local file system (essential for Docker and Streamlit Cloud).
   Library: pypdf for lightweight, dependency-free PDF extraction.
 
 # 2. The RAG Pipeline (The "Brain")
-* Chunking Strategy: Uses RecursiveCharacterTextSplitter with an overlap of 200 tokens.
+* Chunking Strategy: Uses RecursiveCharacterTextSplitter with an overlap of 130 tokens.
   Why? To preserve context across page breaks and ensure the embedding captures the full meaning of technical clauses.
 * Vector Store: FAISS (Facebook AI Similarity Search).
   Logic: Converts text chunks into high-dimensional vectors. It uses Cosine Similarity to find the most relevant policy text for every RFP question.
@@ -35,19 +35,26 @@ The project is built using a Decoupled Architecture, separating the UI (Streamli
 * Embeddings: Google Generative AI Embeddings (models/embedding-001).
 
 # 3. LLM Pipeline & Grounded Generation
-* Model: Google Gemini 2.5 Flash (optimized for speed and long-context window).
+* Model: openai/gpt-oss-120b (optimized for speed and long-context window).
 * The "Zero-Hallucination" Prompt: The system uses a strict system prompt. If the answer is not found in the vector search results, the LLM is forced to state "Information not found" rather than guessing.
 * Rate-Limit Handling: Custom logic built to handle the Gemini Free Tier constraints, including time.sleep intervals and error-retry logic to ensure the pipeline doesn't crash during long CSV processing.
 
 # 🏗️ Technical Stack
 Category       ->      Technology
+Programming_lang ->      Python
 Interface      ->      Streamlit (Multi-page Architecture)
 Orchestration  ->      LangChain
-LLM            ->      Google Gemini 1.5 Flash
+LLM            ->      openai/gpt-oss-120b
+EmbeddingModel ->      models/embedding-001
 Vector DB      ->      FAISS
 Data Handling  ->      Pandas (Vectorized CSV processing)
 Environment    ->      Docker (Containerized for portability)
 Automation     ->      GitHub Actions (CI/CD Linting)
+Security       ->      presidio analyzer/ presidio anonymizer
+# Data Security and Integrity 
+1. Prompt Injection: Implement the method that check for promot injection in every question of the RFP csv file before sending to the LLM.
+2. Personally Identifiable Information(PII): Implement the method that preserve/hide the personal data of the employee and company like email, address, IP address, name etc using a python library named Microsoft Presidio.
+3. Confidence Score: While generating the answer of the RFP questions, the LLM will also generate the confidence score ranging from 0 to 100 and a reason for generating that particular answer by giving the exact location of the context in policies.
 
 # 📈 Key Engineering Highlights
 * Memory Optimization: Implemented a generator-based callback system to update the UI progress bar without blocking the main execution thread.
@@ -56,12 +63,13 @@ Automation     ->      GitHub Actions (CI/CD Linting)
 * frontend_code/: Pure UI logic.
 * core/: Pure RAG and LLM logic.
 * app.py: Controller managing the data flow.
+* Security.py: Hold all the logic of the Security of the data.
 
 
 # Manual Setup
 1. Clone the repo: git clone https://github.com/your-username/AUTO_RFP.git
 2. Install dependencies: pip install -r requirements.txt
-3. Set up your .env file with GOOGLE_API_KEY.
+3. Set up your .env file with Groq_API_KEY.
 4. Run the app: streamlit run app.py
 
 # 👨‍💻 Logic Deep Dive: Why This Works
@@ -70,8 +78,8 @@ Developer Note: The hardest part of this project wasn't the AI—it was the data
 # 🛑 Troubleshooting & System Resilience
 In a production environment, external APIs and data formats are the primary points of failure. NexusAI is designed with the following safety nets:
 
-1. Gemini API Rate Limiting (Error 429)
-Problem: The Google Gemini Free Tier is restricted to a limited number of Requests Per Minute (RPM). Solution: * The system implements a 2-second mandatory cooldown between queries to avoid hitting the 429 threshold.
+1. Groq API Rate Limiting (Error 429)
+Problem: The Groq Models Free Tier is restricted to a limited number of Requests Per Minute (RPM). Solution: * The system implements a 10-second mandatory cooldown between queries to avoid hitting the 429 threshold.
 Recruiter Note: If you encounter a "Resource Exhausted" error during large CSV processing, the system will pause. In a professional setting, this would be handled by a Celery task queue with exponential backoff, but for this MVP, it is managed via a synchronized sleep loop to ensure stability without cost.
 
 2. PDF Parsing Failures
@@ -83,3 +91,8 @@ If text extraction returns 0 pages: Ensure the PDF is not password-protected or 
 Problem: The system expects the CSV to follow a specific structure (ID, Question, Response, Confidence). Solution:
 I implemented Pandas Column Mapping logic using df.iloc. Even if the user provides extra columns, the system extracts only the top 4 relevant indices.
 Constraint: If the second column (Index 1) does not contain the "Question text," the LLM will receive garbage data. Always ensure your CSV matches the provided template in the /samples folder.
+
+📩 Contact
+I am currently looking for roles in AI Engineering and Data Science. If you are looking for a developer who understands the intersection of AI Research and Production Stability, let's connect.
+Email: mundriamohit100@gmail.com
+LinkedIn: www.linkedin.com/in/mohit-mundria-31631a322
