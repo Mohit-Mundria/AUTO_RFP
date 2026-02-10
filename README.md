@@ -40,21 +40,24 @@ The project is built using a Decoupled Architecture, separating the UI (Streamli
 * Rate-Limit Handling: Custom logic built to handle the Gemini Free Tier constraints, including time.sleep intervals and error-retry logic to ensure the pipeline doesn't crash during long CSV processing.
 
 # 🏗️ Technical Stack
-Category       ->      Technology
-Programming_lang ->      Python
-Interface      ->      Streamlit (Multi-page Architecture)
-Orchestration  ->      LangChain
-LLM            ->      openai/gpt-oss-120b
-EmbeddingModel ->      models/embedding-001
-Vector DB      ->      FAISS
-Data Handling  ->      Pandas (Vectorized CSV processing)
-Environment    ->      Docker (Containerized for portability)
-Automation     ->      GitHub Actions (CI/CD Linting)
-Security       ->      presidio analyzer/ presidio anonymizer
+*  Category       ->      Technology
+1. Programming_lang ->      Python
+2. Interface      ->      Streamlit (Multi-page Architecture)
+3. Orchestration  ->      LangChain
+4. LLM            ->      openai/gpt-oss-120b
+5. EmbeddingModel ->      models/embedding-001
+6. Vector DB      ->      FAISS
+7. Data Handling  ->      Pandas (Vectorized CSV processing)
+8. Environment    ->      Docker (Containerized for portability)
+9. Automation     ->      GitHub Actions (CI/CD Linting)
+10. Security       ->      presidio analyzer/ presidio anonymizer
 # Data Security and Integrity 
 1. Prompt Injection: Implement the method that check for promot injection in every question of the RFP csv file before sending to the LLM.
 2. Personally Identifiable Information(PII): Implement the method that preserve/hide the personal data of the employee and company like email, address, IP address, name etc using a python library named Microsoft Presidio.
 3. Confidence Score: While generating the answer of the RFP questions, the LLM will also generate the confidence score ranging from 0 to 100 and a reason for generating that particular answer by giving the exact location of the context in policies.
+
+# Zero-Friction Recruiter Mode
+Integrated a Pre-built FAISS Index, Smaple Company Policies and Sample RFP Excel file bypass. Recruiters can click "Try with Sample Data" to see instant result mapping without waiting for API processing or document uploads. It save the precious time of the Viewer.
 
 # 📈 Key Engineering Highlights
 * Memory Optimization: Implemented a generator-based callback system to update the UI progress bar without blocking the main execution thread.
@@ -94,5 +97,5 @@ Constraint: If the second column (Index 1) does not contain the "Question text,"
 
 📩 Contact
 I am currently looking for roles in AI Engineering and Data Science. If you are looking for a developer who understands the intersection of AI Research and Production Stability, let's connect.
-Email: mundriamohit100@gmail.com
-LinkedIn: www.linkedin.com/in/mohit-mundria-31631a322
+1. Email: mundriamohit100@gmail.com
+2. LinkedIn: www.linkedin.com/in/mohit-mundria-31631a322
