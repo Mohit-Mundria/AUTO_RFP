@@ -1,5 +1,7 @@
 FROM python:3.13
-COPY /app
+COPY . .
+COPY requirements.txt .
 WORKDIR /app
 RUN pip install -r requirements.txt
-CMD gunicorn --workers=4--bind 0.0.0.0:&PORT app:app
+EXPOSE 7860
+CMD ["streamlit", "run", "app.py", "--server.port=7860", "--server.address=0.0.0.0"]
