@@ -1,6 +1,6 @@
 numpy
 pandas
-streamlit
+streamlit>=1.40.0
 langchain
 langchain_core
 pathlib
@@ -13,4 +13,3 @@ faiss_cpu
 presidio_analyzer
 presidio_anonymizer
 spacy
-altair<5
