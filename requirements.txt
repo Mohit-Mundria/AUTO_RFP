@@ -13,3 +13,4 @@ faiss_cpu
 presidio_analyzer
 presidio_anonymizer
 spacy
+altair<5
