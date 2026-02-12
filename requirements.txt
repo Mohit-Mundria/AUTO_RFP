@@ -1,5 +1,6 @@
 numpy
 pandas
+streamlit
 langchain
 langchain_core
 pathlib
@@ -11,3 +12,4 @@ python_dotenv
 faiss_cpu
 presidio_analyzer
 presidio_anonymizer
+spacy
