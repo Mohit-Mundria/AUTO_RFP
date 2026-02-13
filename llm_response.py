@@ -2,6 +2,7 @@ from langchain_community.vectorstores import FAISS
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import PromptTemplate
+from s3_vectorDB import download_index_from_s3, upload_index_to_s3, S3_BUCKET_NAME
 from typing import Any
 from dotenv import load_dotenv
 import os
@@ -19,27 +20,41 @@ embedding_model=GoogleGenerativeAIEmbeddings(google_api_key=GOOGLE_API_KEY, mode
 
 # In the following function we perform embedding, and then store that in the Vector Database and then create a retriver object
 def retiver_fun(chunks:list[Any]):
-    db_path="faiss.index"
-    if os.path.exists(db_path):
-        vector_db=FAISS.load_local(db_path,embedding_model,allow_dangerous_deserialization=True)
-        print("sucessfully load the vector database which alreday present")
+    db_folder="Unnecessary_files/faiss.index"
+    
+    # 1. Try to download from S3 first
+    if S3_BUCKET_NAME:
+        download_index_from_s3(S3_BUCKET_NAME, db_folder)
+    
+    # 2. Check if local index exists (either downloaded or previously present)
+    if os.path.exists(os.path.join(db_folder, "index.faiss")):
+        vector_db=FAISS.load_local(db_folder,embedding_model,allow_dangerous_deserialization=True)
+        print("sucessfully load the vector database")
     else:
-        # text=[chunk.page_content for chunk in chunks]
-        # print("text afetr the embedding,: ", len(text))
-        # embeddings=embedding_model.embed_documents(text)
-        # print(f"Successfully create the embeddings of the chunks")
+        # 3. If not, create new index from chunks
         print("Vector store is not present, creating vectorDatabase............")
+        
+        # Create directory if it doesn't exist (e.g. for first time run)
+        if not os.path.exists(db_folder):
+             os.makedirs(db_folder)
+
         batch_size=20
         time_delay=10
         first_batch=chunks[:batch_size]
         vector_db=FAISS.from_documents(first_batch, embedding_model)
         for i in range(batch_size, len(chunks), batch_size):
-            batch=chunks[batch_size:1+batch_size]
+            batch=chunks[i:i+batch_size]
             vector_db.add_documents(batch)
             print(f"Progress: {i + len(batch)}/{len(chunks)} chunks indexed...")
             time.sleep(time_delay)
-        vector_db.save_local(db_path)
+        
+        vector_db.save_local(db_folder)
         print("Step of Vector Database creation is completed and Save fresh new data vector.......at given location.............")
+        
+        # 4. Upload to S3 for persistence
+        if S3_BUCKET_NAME:
+            upload_index_to_s3(S3_BUCKET_NAME, db_folder)
+
     retriver=vector_db.as_retriever(search_type='similarity', search_kwargs={'k':8})
     return retriver
 
