@@ -1,112 +1,93 @@
----
-title: TurboRFP
-emoji: 🛡️
-colorFrom: blue
-colorTo: slate
-sdk: streamlit
-sdk_version: 1.31.0
-app_file: app.py
-pinned: false
----
 
-# 🕵️ TurboRFP: Enterprise RFP & Security Questionnaire Automator (A Business To Business Problem Solver)
-# Live Project Simulation Link: 
-https://autorfp-8vvyzwavy3vmzejdqzkbu3.streamlit.app/
 
-Output_ScreenRecording_RFP: 
-https://youtu.be/srC5kR8GF-0
+## 🕵️ TurboRFP: Enterprise RFP & Security Questionnaire Automator (A Business To Business Problem Solver)
 
-Deployed_ProjectOutput_RFP:
-https://youtu.be/SZZvgpEyAUo
-
-# 📌 The Problem: The "40-Hour" Compliance Bottleneck
+## 📌 The Problem: The "40-Hour" Compliance Bottleneck
 Enterprise sales teams face a massive hurdle: Security RFPs. Companies must answer hundreds of complex technical questions (e.g., "How is data encrypted at rest in your DB?") by manually searching through 100+ page security policies, AWS/Azure whitepapers, and SOC2 reports.
 
 * Manual Effort: Takes 3–5 days per RFP.
 * Risk: High chance of human error/hallucination in answers.
 * Scalability: Impossible to handle 10+ RFPs simultaneously without a massive team.
 
-# 🚀 The Solution: TurboRFP
+## 🚀 The Solution: TurboRFP
 TurboRFP is an End-to-End RAG (Retrieval-Augmented Generation) Pipeline designed to automate the extraction and answering process. It transforms unstructured PDF policies into a searchable vector brain, providing grounded, high-confidence answers to CSV-based questionnaires in minutes.
 
-# 🛠️ System Architecture & Logic Flow
-The project is built using a Decoupled Architecture, separating the UI (Streamlit), the Orchestration (App Controller), and the Brain (RAG Engine).
+**Automate your Security Questionnaires and RFPs with the power of Generative AI.**  
+NexusAI is an advanced RAG (Retrieval-Augmented Generation) application designed to drastically reduce the time spent on answering Request for Information (RFI) and Request for Proposal (RFP) documents. By leveraging your internal knowledge base, it provides accurate, context-aware, and secure responses.
 
-# 1. In-Memory Data Ingestion (Engineering Effort)
-* Most beginner projects rely on local folder paths. TurboRFP uses Stream-based Processing.
-  Logic: Files are handled as BytesIO streams. This ensures the app is cloud-ready and doesn't require a local file system (essential for Docker and Streamlit Cloud).
-  Library: pypdf for lightweight, dependency-free PDF extraction.
+---
 
-# 2. The RAG Pipeline (The "Brain")
-* Chunking Strategy: Uses RecursiveCharacterTextSplitter with an overlap of 130 tokens.
-  Why? To preserve context across page breaks and ensure the embedding captures the full meaning of technical clauses.
-* Vector Store: FAISS (Facebook AI Similarity Search).
-  Logic: Converts text chunks into high-dimensional vectors. It uses Cosine Similarity to find the most relevant policy text for every RFP question.
+## 🏗️ Architecture
 
-* Embeddings: Google Generative AI Embeddings (models/embedding-001).
+The system follows a modern RAG architecture, utilizing a hybrid cloud approach for scalability and security.
 
-# 3. LLM Pipeline & Grounded Generation
-* Model: openai/gpt-oss-120b (optimized for speed and long-context window).
-* The "Zero-Hallucination" Prompt: The system uses a strict system prompt. If the answer is not found in the vector search results, the LLM is forced to state "Information not found" rather than guessing.
-* Rate-Limit Handling: Custom logic built to handle the Gemini Free Tier constraints, including time.sleep intervals and error-retry logic to ensure the pipeline doesn't crash during long CSV processing.
+```mermaid
+graph TD
+    User[User (Security Officer)] -->|Uploads PDF & CSV| FE[Streamlit Frontend]
+    FE -->|PDF| Ingest[Document Ingestion]
+    FE -->|CSV| Proc[Question Processor]
+    
+    subgraph "Data Pipeline"
+        Ingest -->|Chunking| Chunker[Doc Chunker]
+        Chunker -->|Embed| EmbModel[Google Gemini Embeddings]
+        EmbModel -->|Store/Retrieve| VectorDB[(FAISS Vector DB)]
+        VectorDB <-->|Sync| S3[AWS S3 Bucket]
+    end
+    
+    subgraph "Inference Engine"
+        Proc -->|Query| RAG[RAG Chain]
+        RAG -->|Retrieve Context| VectorDB
+        RAG -->|Redact PII| Presidio[Microsoft Presidio]
+        Presidio -->|Context + Query| LLM[Groq (Llama3/Mixtral)]
+        LLM -->|Answer| Response[Generated Response]
+    end
+    
+    Response -->|Update CSV| FE
+    FE -->|Download| User
+```
 
-# 🏗️ Technical Stack
-*  Category       ->      Technology
-1. Programming_lang ->      Python
-2. Interface      ->      Streamlit (Multi-page Architecture)
-3. Orchestration  ->      LangChain
-4. LLM            ->      openai/gpt-oss-120b
-5. EmbeddingModel ->      models/embedding-001
-6. Vector DB      ->      FAISS
-7. Data Handling  ->      Pandas (Vectorized CSV processing)
-8. Environment    ->      Docker (Containerized for portability)
-9. Automation     ->      GitHub Actions (CI/CD Linting)
-10. Security       ->      presidio analyzer/ presidio anonymizer
-# Data Security and Integrity 
+---
+
+## 🛠️ Tech Stack
+
+This project is built using a robust selection of modern AI and web technologies:
+
+| Component | Technology | Description |
+| :--- | :--- | :--- |
+| **Frontend** | ![Streamlit](https://img.shields.io/badge/-Streamlit-FF4B4B?style=flat-square&logo=streamlit&logoColor=white) | Interactive web interface for easy file uploads and result visualization. |
+| **LLM Inference** | ![Groq](https://img.shields.io/badge/-Groq-f55036?style=flat-square) | Ultra-fast inference using open-source models (openai/gpt-oss-120b) via Groq API. |
+| **Embeddings** | ![Gemini](https://img.shields.io/badge/-Google%20Gemini-4285F4?style=flat-square&logo=google&logoColor=white) | High-performance embedding generation with `models/gemini-embedding-001`. |
+| **Orchestration** | ![LangChain](https://img.shields.io/badge/-LangChain-1C3C3C?style=flat-square&logo=langchain&logoColor=white) | Manages the prompt engineering, retrieval chains, and LLM auditing. |
+| **Vector DB** | ![FAISS](https://img.shields.io/badge/-FAISS-005A9C?style=flat-square) | Efficient similarity search for retrieving relevant documentation. |
+| **Cloud Storage** | ![AWS S3](https://img.shields.io/badge/-AWS%20S3-569A31?style=flat-square&logo=amazon-s3&logoColor=white) | Persistent storage for the Vector Database to allow serverless-like scaling. |
+| **Security** | ![Presidio](https://img.shields.io/badge/-Microsoft%20Presidio-0078D4?style=flat-square&logo=microsoft&logoColor=white) | Automated detection and redaction of PII (Personally Identifiable Information), Prompt Injection, LLM Auditing via confidence score|
+| **Compute** | ![AWS EC2](https://img.shields.io/badge/-AWS%20EC2-FF9900?style=flat-square&logo=amazon-ec2&logoColor=white) | Hosted on scalable AWS EC2 instances for reliable availability. |
+
+---
+
+## ✨ Key Features
+
+- **📄 Document Parsing**: Robustly handles PDF knowledge bases and Excel/CSV questionnaires.
+- **🔍 Smart Retrieval**: Uses FAISS and Google Gemini embeddings to find the exact policy or technical spec needed.
+- **🛡️ PII Protection**: Integrated PII analyzer prevents sensitive data leakage in prompts using Microsoft Presidio.
+- **⚡ Blazing Fast Generation**: Powered by Groq's LPU inference engine for near-instant answers.
+- **☁️ Cloud Persistent State**: Automatically syncs vector indexes to AWS S3, so knowledge is never lost between restarts.
+- **💉 Prompt Injection Defense**: Basic heuristics to detect and block malicious prompt injection attempts in incoming questions.
+- **📊 Confidence Scoring**: Every answer comes with a confidence score and reasoning, ensuring trutworthiness.
+
+---
+
+## Data Security and Integrity 
 1. Prompt Injection: Implement the method that check for promot injection in every question of the RFP csv file before sending to the LLM.
 2. Personally Identifiable Information(PII): Implement the method that preserve/hide the personal data of the employee and company like email, address, IP address, name etc using a python library named Microsoft Presidio.
 3. Confidence Score: While generating the answer of the RFP questions, the LLM will also generate the confidence score ranging from 0 to 100 and a reason for generating that particular answer by giving the exact location of the context in policies.
 
-# Zero-Friction Recruiter Mode
-Integrated a Pre-built FAISS Index, Smaple Company Policies and Sample RFP Excel file bypass. Recruiters can click "Try with Sample Data" to see instant result mapping without waiting for API processing or document uploads. It save the precious time of the Viewer.
-
-# 📈 Key Engineering Highlights
-* Memory Optimization: Implemented a generator-based callback system to update the UI progress bar without blocking the main execution thread.
-* Robust Error Handling: Added pd.to_numeric coercion to handle messy CSV inputs (headers, empty rows, or non-numeric IDs) without crashing the loop.
-* Separation of Concerns: The project follows a strict directory structure:
-* frontend_code/: Pure UI logic.
-* core/: Pure RAG and LLM logic.
-* app.py: Controller managing the data flow.
-* Security.py: Hold all the logic of the Security of the data.
-
-
-# Manual Setup
-1. Clone the repo: git clone https://github.com/your-username/AUTO_RFP.git
-2. Install dependencies: pip install -r requirements.txt
-3. Set up your .env file with Groq_API_KEY.
-4. Run the app: streamlit run app.py
-
-# 👨‍💻 Logic Deep Dive: Why This Works
-Developer Note: The hardest part of this project wasn't the AI—it was the data flow. Transitioning from a local script that "looks at a folder" to a web app that "receives bytes" required a complete refactor of the ingestion logic. This ensures that the system is scalable and can be deployed on any server architecture without modification.
-
-# 🛑 Troubleshooting & System Resilience
-In a production environment, external APIs and data formats are the primary points of failure. NexusAI is designed with the following safety nets:
-
-1. Groq API Rate Limiting (Error 429)
-Problem: The Groq Models Free Tier is restricted to a limited number of Requests Per Minute (RPM). Solution: * The system implements a 10-second mandatory cooldown between queries to avoid hitting the 429 threshold.
-Recruiter Note: If you encounter a "Resource Exhausted" error during large CSV processing, the system will pause. In a professional setting, this would be handled by a Celery task queue with exponential backoff, but for this MVP, it is managed via a synchronized sleep loop to ensure stability without cost.
-
-2. PDF Parsing Failures
-Problem: Some PDFs are "Scanned Images" (OCR required) rather than "Digital Text." Solution:
-Currently, the system uses pypdf for fast, digital text extraction.
-If text extraction returns 0 pages: Ensure the PDF is not password-protected or a raw image scan. For production-grade OCR, the roadmap includes integrating pdfplumber or pytesseract.
-
-3. CSV Alignment Issues
-Problem: The system expects the CSV to follow a specific structure (ID, Question, Response, Confidence). Solution:
-I implemented Pandas Column Mapping logic using df.iloc. Even if the user provides extra columns, the system extracts only the top 4 relevant indices.
-Constraint: If the second column (Index 1) does not contain the "Question text," the LLM will receive garbage data. Always ensure your CSV matches the provided template in the /samples folder.
-
-📩 Contact
+## 📩 Contact
 I am currently looking for roles in AI Engineering and Data Science. If you are looking for a developer who understands the intersection of AI Research and Production Stability, let's connect.
-1. Email: mundriamohit100@gmail.com
-2. LinkedIn: www.linkedin.com/in/mohit-mundria-31631a322
+
+**Author:** [Mohit Mundria]  
+**Email:** [mundriamohit100@gmail.com]  
+**LinkedIn:** [www.linkedin.com/in/mohit-mundria-31631a322]
+
+---
+*Built with ❤️ for efficiency and security.*
