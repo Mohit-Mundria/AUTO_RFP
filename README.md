@@ -1,6 +1,10 @@
 
 
 ## 🕵️ TurboRFP: Enterprise RFP & Security Questionnaire Automator (A Business To Business Problem Solver)
+# Live Demo of the Project: 
+http://13.53.125.103/
+# Running Project on Treminal Video:
+https://youtu.be/srC5kR8GF-0?si=w9Dq9bfZb0DSY9mn
 
 ## 📌 The Problem: The "40-Hour" Compliance Bottleneck
 Enterprise sales teams face a massive hurdle: Security RFPs. Companies must answer hundreds of complex technical questions (e.g., "How is data encrypted at rest in your DB?") by manually searching through 100+ page security policies, AWS/Azure whitepapers, and SOC2 reports.
