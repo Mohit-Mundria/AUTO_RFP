@@ -1,9 +1,9 @@
 
 
-## 🕵️ TurboRFP: Enterprise RFP & Security Questionnaire Automator (A Business To Business Problem Solver)
-# Live Demo of the Project: 
+# 🕵️ TurboRFP: Enterprise RFP & Security Questionnaire Automator (A Business To Business Problem Solver)
+## Live Demo of the Project: 
 http://13.53.125.103/
-# Running Project on Treminal Video:
+## Running Project on Treminal Video:
 https://youtu.be/srC5kR8GF-0?si=w9Dq9bfZb0DSY9mn
 
 ## 📌 The Problem: The "40-Hour" Compliance Bottleneck
@@ -13,7 +13,7 @@ Enterprise sales teams face a massive hurdle: Security RFPs. Companies must answ
 * Risk: High chance of human error/hallucination in answers.
 * Scalability: Impossible to handle 10+ RFPs simultaneously without a massive team.
 
-## 🚀 The Solution: TurboRFP
+# 🚀 The Solution: TurboRFP
 TurboRFP is an End-to-End RAG (Retrieval-Augmented Generation) Pipeline designed to automate the extraction and answering process. It transforms unstructured PDF policies into a searchable vector brain, providing grounded, high-confidence answers to CSV-based questionnaires in minutes.
 
 **Automate your Security Questionnaires and RFPs with the power of Generative AI.**  
@@ -79,12 +79,12 @@ graph TD
         model_kwargs=model_kwargs,
         encode_kwargs=encode_kwargs
     )
-   Remove: The time.sleep() from the llm_response file, as we do not require this anymore.
-   Remove: Comment Out the body of "analyze_pii_data" function in the Securities.py file. As I am using the AWS free tier account, I do not have enough resource to install the required library so comment out the             imports:
+2. Remove: The time.sleep() from the llm_response file, as we do not require this anymore.
+3. Remove: Comment Out the body of "analyze_pii_data" function in the Securities.py file. As I am using the AWS free tier account, I do not have enough resource to install the required library so comment out the             imports:
            from presidio_analyzer import AnalyzerEngine
            from presidio_anonymizer import AnonymizerEngine
-   Remove: You can remove the unnecessary library from the requirements.txt
-   # NOTE: 
+4. Remove: You can remove the unnecessary library from the requirements.txt
+## NOTE: 
    I am very beginner to AWS so I take help of  Gemini To deploy my Website On AWS. Also I use AI for the better UI/UX design as my main goal and efforts were to make the system/pipeline run without any error and    solve a real world problem.
    
 ## 🛠️ Tech Stack
