@@ -51,7 +51,42 @@ graph TD
 ```
 
 ---
+🔄 The S3-to-EC2 Data Lifecycle
+1. The system ensures that the "Knowledge Brain" (FAISS Index) is persistent, scalable, and decoupled from the compute instance.
+2. Ingestion & Embedding: When a document is uploaded, the RAG engine chunks the data and generates high-dimensional embeddings using the Gemini Embedding model.
+3. Local Indexing: A temporary FAISS index is built in the EC2 instance's RAM and saved to the local disk.
+   S3 Synchronization (s3_vectorDB.py): * Upload: Upon completion of indexing, the system triggers an automated sync, pushing the FAISS .index and metadata files to an Amazon S3 Bucket.
+   Download: On service startup (systemd), the instance checks S3 for an existing index. If found, it pulls the latest vector state to the local environment, ensuring zero-knowledge loss during redeployments.
+4. Query Execution: User queries are embedded and compared against the local FAISS index for sub-second retrieval, minimizing S3 latency during the inference phase.
 
+🛠 Deployment Specifications
+1. Compute: AWS EC2 (t3.medium recommended) running Ubuntu 24.04.
+2. Process Management: Managed via systemd with a custom service unit for 99.9% uptime.
+3. Object Storage: Amazon S3 for persistent vector store and document backups.
+4. Infrastructure-as-Code: Bash-automated deployment via run_ec2.sh for one-click environment setup.
+
+## Updates Required For Deployment over AWS
+1. The Google Gemini Embedding Models have a limited usages quota only which do not satisfy the project Requirements. So I decide to change the Embedding model to BERT open source Model.
+   CHANGES: 
+   Remove: from langchain_google_genai import GoogleGenerativeAIEmbeddings
+   Add: from langchain_huggingface import HuggingFaceEmbeddings
+        model_name = "sentence-transformers/all-MiniLM-L6-v2"
+        Force the model to run on the CPU (AWS Free Tier has no GPU)
+        model_kwargs = {'device': 'cpu'}
+        encode_kwargs = {'normalize_embeddings': True}
+        return HuggingFaceEmbeddings(
+        model_name=model_name,
+        model_kwargs=model_kwargs,
+        encode_kwargs=encode_kwargs
+    )
+   Remove: The time.sleep() from the llm_response file, as we do not require this anymore.
+   Remove: Comment Out the body of "analyze_pii_data" function in the Securities.py file. As I am using the AWS free tier account, I do not have enough resource to install the required library so comment out the             imports:
+           from presidio_analyzer import AnalyzerEngine
+           from presidio_anonymizer import AnonymizerEngine
+   Remove: You can remove the unnecessary library from the requirements.txt
+   # NOTE: 
+   I am very beginner to AWS so I take help of  Gemini To deploy my Website On AWS. Also I use AI for the better UI/UX design as my main goal and efforts were to make the system/pipeline run without any error and    solve a real world problem.
+   
 ## 🛠️ Tech Stack
 
 This project is built using a robust selection of modern AI and web technologies:
